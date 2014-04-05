@@ -27,7 +27,7 @@ namespace QuickSort
             var leftArray = itemList.Where((item, i) =>  i != pivot && item.CompareTo(itemList[pivot]) <= 0);
             var rightArray = itemList.Where((item, i) => i != pivot && item.CompareTo(itemList[pivot]) > 0);
 
-            return Concat(NaiveSort(leftArray.ToArray()).ToList(),  itemList[pivot], NaiveSort(rightArray.ToArray()).ToList());
+            return Concat(NaiveSort(leftArray.ToArray()).ToList(),  itemList[pivot], NaiveSort(rightArray.ToArray()));
         }
 
 
@@ -40,7 +40,7 @@ namespace QuickSort
         /// <param name="item"></param>
         /// <param name="array2"></param>
         /// <returns></returns>
-        private static IEnumerable<T> Concat<T>(List<T> array1, T item, List<T> array2) where T : IComparable
+        private static IEnumerable<T> Concat<T>(List<T> array1, T item, IEnumerable<T> array2) where T : IComparable
         {
             array1.Add(item);
             array1.AddRange(array2);
