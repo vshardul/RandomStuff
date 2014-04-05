@@ -10,7 +10,8 @@ namespace EditDistance
 
     public class EditDistanceCalculator
     {
-        private string word1, word2;
+        private readonly string word1;
+        private readonly string word2;
 
         /// <summary>
         /// 
@@ -69,8 +70,9 @@ namespace EditDistance
             int cost = word1[word1.Length - 1] == word2[word2.Length - 1] ? 0 : 1;
             int potentialSubstitutionCost =
                 NaiveLevenstienDistanceBetweenWords(word1.Remove(word1.Length - 1), word2.Remove(word2.Length - 1)) + cost;
-
-           return Min(potentialDeleteCost, potentialInsertCost, potentialSubstitutionCost);
+           // dummy
+            char operation;
+           return Min(potentialDeleteCost, potentialInsertCost, potentialSubstitutionCost, out operation);
         }
 
         /// <summary>
@@ -106,16 +108,22 @@ namespace EditDistance
             }
 
             var editDistances = new int[word1.Length + 1, word2.Length + 1];
+            var operations = new char[word1.Length + 1, word2.Length + 1];
             
             int i = 1;
             int j = 1;
+            string sequence = "";
+            editDistances[0, 0] = 0;
+
             foreach (var letter1 in word1)
             {
-                editDistances[i, 0] = i-1;
+                editDistances[i, 0] = i;
+                operations[i, 0] = 'D';
                 j = 1;
                 foreach (var letter2 in word2)
                 {
-                    editDistances[0, j] = j-1;
+                    editDistances[0, j] = j;
+                    operations[0, j] = 'I';
                     int cost = 0;
                     if (letter1 != letter2)
                     {
@@ -123,13 +131,42 @@ namespace EditDistance
                     }
 
                     editDistances[i,j] = Min(
-                        editDistances[i - 1, j] + 1, editDistances[i, j - 1] + 1, editDistances[i - 1, j - 1] + cost);
+                        editDistances[i - 1, j] + 1, editDistances[i, j - 1] + 1, editDistances[i - 1, j - 1] + cost, out operations[i,j]);
+
+                    // bug here - operation sequence not correct
+                    if (i == j)
+                    {
+                        if (cost != 0)
+                        {
+                            sequence += operations[i, j];
+                        }
+                        else
+                        {
+                            sequence += " ";
+                        }
+                    }
                     j++;
                 }
 
                 i++;
             }
 
+            Console.WriteLine("Sequence of Operations - ");
+            Console.Write(sequence);
+            Console.WriteLine();
+
+            Console.WriteLine("The entrire matrix of operations are - ");
+            for (int k = 0; k < i; k++)
+            {
+                for (int l = 0; l < j; l++)
+                {
+                    Console.Write(
+                        string.Format(" {0} ", operations[k, l]));
+                }
+                Console.WriteLine();
+            }
+            
+            Console.WriteLine();
             return editDistances[i-1,j-1];
         }
 
@@ -139,20 +176,24 @@ namespace EditDistance
         /// <param name="num1"></param>
         /// <param name="num2"></param>
         /// <param name="num3"></param>
+        /// <param name="operation"></param>
         /// <returns></returns>
-        private static int Min(int num1, int num2, int num3)
+        private static int Min(int num1, int num2, int num3, out char operation)
         {
             // Calculate minimum value
             int minimumValue = num1;
+            operation = 'D';
 
             if (minimumValue > num2)
             {
                 minimumValue = num2;
+                operation = 'I';
             }
 
             if (minimumValue > num3)
             {
                 minimumValue = num3;
+                operation = 'S';
             }
 
             return minimumValue;
