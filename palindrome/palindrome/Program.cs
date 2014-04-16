@@ -14,11 +14,10 @@ namespace palindrome
             {
                 Console.WriteLine("enter string");
                 var inputString = Console.ReadLine();
-                string left = "", right = "";
-                var palindrome = FindLongestPalindrome(inputString, left, right);
+                var palindrome = FindLongestPalindrome(inputString);
 
-                Console.WriteLine("Lenght of longest palindrome = " + palindrome);
-                Console.WriteLine("longest palindrome = {0}{1}", left, right);
+                Console.WriteLine("Lenght of longest palindrome = " + palindrome.Lenght);
+                Console.WriteLine("longest palindrome = {0}", palindrome.Word );
 
                 Console.WriteLine("Enter ESC to quit, any other key to continue");
                 var nextKey = Console.ReadKey();
@@ -29,46 +28,48 @@ namespace palindrome
             }
         }
 
-        private static Dictionary<string, int> palindromeDict = new Dictionary<string, int>();
+        private static readonly Dictionary<string, PalindromeStringDataType> PalindromeDict = new Dictionary<string, PalindromeStringDataType>();
         
-        private static int FindLongestPalindrome(string inputString, string leftString, string rightString)
+        private static PalindromeStringDataType FindLongestPalindrome(string inputString)
         {
-            if (inputString.Count() == 0 || inputString == null)
+            if (!inputString.Any() || inputString == null)
             {
-                return 0;
+                return new PalindromeStringDataType(){Lenght = 0, Word = ""};
             }
 
-            if (palindromeDict.ContainsKey(inputString))
+            if (PalindromeDict.ContainsKey(inputString))
             {
-                return palindromeDict[inputString];
+                return PalindromeDict[inputString];
             }
 
             int lenght = inputString.Length;
-            int count1 = 0, count2 = 0, count3 = 0;
+            var initType = new PalindromeStringDataType { Lenght = 0, Word = "" };
+            PalindromeStringDataType count2, count3, point;
+            PalindromeStringDataType count1 = count2 = count3 = point = initType;
             
-            int point = 0;
             if (lenght == 1)
             {
-                point = 1;
+                point = new PalindromeStringDataType { Lenght = 1, Word = inputString};
             }
             else
             {
+                var temp = FindLongestPalindrome(inputString.Substring(1, lenght - 2));
                 if (inputString[0] == inputString[lenght - 1])
                 {
-                    count1 = 2 + FindLongestPalindrome(inputString.Substring(1, lenght - 2), string.Format("{0}{1}", inputString[0], leftString), string.Format("{0}{1}", inputString[lenght - 1], rightString));
+                    count1 = new PalindromeStringDataType() { Lenght = 2 + temp.Lenght, Word = inputString[0] + temp.Word + inputString[lenght - 1] };
                 }
                 else
                 {
-                    count1 = 0 + FindLongestPalindrome(inputString.Substring(1, lenght - 2), leftString, rightString);
+                    count1 = temp;
                 }
                 
-                count2 = 0 + FindLongestPalindrome(inputString.Substring(0, lenght - 1), leftString, rightString);
-                count3 = 0 + FindLongestPalindrome(inputString.Substring(1, lenght - 1), leftString, rightString);
+                count2 = FindLongestPalindrome(inputString.Substring(0, lenght - 1));
+                count3 = FindLongestPalindrome(inputString.Substring(1, lenght - 1));
             }
             
-            int finalcount = new int[] { count1, count2, count3, point }.OrderByDescending(value => value).First();
-            palindromeDict[inputString] = finalcount;
-            return finalcount;
+            var finalPalindrome = new PalindromeStringDataType[] { count1, count2, count3, point }.OrderByDescending(entry => entry.Lenght).First();
+            PalindromeDict[inputString] = finalPalindrome;
+            return finalPalindrome;
         }
     }
 }
