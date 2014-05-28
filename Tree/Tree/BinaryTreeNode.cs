@@ -232,5 +232,65 @@
             list.Add(node.value);
         }
 
+        public static int StoreAllHighValuesInNode(BinaryTreeNode<int> node)
+        {
+            if (node == null)
+            {
+                return 0;
+            }
+
+            node.value = node.value + StoreAllHighValuesInNode(node.right);
+            StoreAllHighValuesInNode(node.left);
+
+            return node.value;
+        }
+
+        public static void PrintPathToLeaf(BinaryTreeNode<int> node, int leafValue)
+        {
+            if (node == null)
+            {
+                return;
+            }
+
+            if (node.value == leafValue)
+            {
+                Console.Write( " -> " + node.value);
+                return;
+            }
+
+            Console.Write(" -> " + node.value);
+            if (leafValue < node.value)
+            {
+                PrintPathToLeaf(node.left, leafValue);
+            }
+            else
+            {
+                PrintPathToLeaf(node.right, leafValue);
+            }
+        }
+
+        public static void PrintPathToLeafWithoutRecursion(BinaryTreeNode<int> node, int leafValue)
+        {
+            if (node == null)
+            {
+                return;
+            }
+
+            while (node.value != leafValue)
+            {
+                Console.Write(" -> " + node.value);
+
+                if (leafValue < node.value)
+                {
+                    node = node.left;
+                }
+                else
+                {
+                    node = node.right;
+                }
+            }
+
+            Console.Write(" -> " + node.value);
+        }
     }
 }

@@ -1,0 +1,58 @@
+
+Welcome to MeetingWords!
+
+This pad text is synchronized as you type, so that everyone viewing this page sees the same text.  This allows you to collaborate seamlessly on documents!
+Hi Shardul
+
+struct cbuf {
+    char *const first;  // range from [*first, *last)
+    char *volatile in;  //  data from [*out, *in)  if out <= in
+    char *volatile out;  // empty: in==out
+    char *const last;
+    };
+
+
+input: *in++= byte;
+output: byte = *out++;
+
+wrap-around: when last==in then change in to first
+when last==out then change out to first
+
+public void CopyCircularBuf(CircularBuffer input, CircularBuffer output)
+{
+    if(input.in == input.out)
+    {
+        return;
+        }
+    
+    while(input.out != input.in)
+    {
+        if(output.in == output.last)
+        {
+            output.in = output.first;
+            }
+            else
+            {
+                output.in++
+                }
+        
+        if(output.in == output.out)
+        {
+            output.in--;
+            break;
+            }
+        
+        output.in = input.out;
+        
+        if(input.out == input.last)
+        {
+            input.out = input.first;
+            }
+        else
+        {
+            input.out++;
+            }  
+    }
+    
+    return;
+    }
